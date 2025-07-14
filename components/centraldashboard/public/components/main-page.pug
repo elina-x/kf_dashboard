@@ -55,7 +55,7 @@ app-drawer-layout.flex(narrow='{{narrowMode}}',
                 aside.divider
                 a(href$='[[_buildHref("/manage-users", queryParams.*)]]', tabindex='-1')
                     paper-item.menu-item#contributors Manage Contributors
-            aside.divider
+        div.bottom-links
             a(href='https://github.com/kubeflow/kubeflow',
                 tabindex='-1', target="_blank")
                 paper-item.menu-item GitHub
@@ -64,6 +64,7 @@ app-drawer-layout.flex(narrow='{{narrowMode}}',
                 tabindex='-1', target="_blank")
                 paper-item.menu-item Documentation
                     iron-icon.external(icon="launch")
+            logout-button(logout-url='[[logoutUrl]]')
         footer.footer
             section.build
                 | build version -
@@ -85,7 +86,6 @@ app-drawer-layout.flex(narrow='{{narrowMode}}',
                     all-namespaces='[[allNamespaces]]',
                     user='[[user]]')
                 footer#User-Badge
-                    logout-button(logout-url='[[logoutUrl]]')
         main#Content
             section#ViewTabs(hidden$='[[hideTabs]]')
                 paper-tabs(selected='[[page]]', attr-for-selected='page')
