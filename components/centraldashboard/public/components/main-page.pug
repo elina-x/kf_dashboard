@@ -56,14 +56,11 @@ app-drawer-layout.flex(narrow='{{narrowMode}}',
                 a(href$='[[_buildHref("/manage-users", queryParams.*)]]', tabindex='-1')
                     paper-item.menu-item#contributors Manage Contributors
         div.bottom-links
-            a(href='https://github.com/kubeflow/kubeflow',
-                tabindex='-1', target="_blank")
-                paper-item.menu-item GitHub
-                    iron-icon.external(icon="launch")
             a(href='https://www.kubeflow.org/docs/about/kubeflow/',
                 tabindex='-1', target="_blank")
-                paper-item.menu-item Documentation
-                    iron-icon.external(icon="launch")
+                paper-item.menu-item
+                    iron-icon(icon="info-outline")
+                    | Documentation
             logout-button(logout-url='[[logoutUrl]]')
         footer.footer
             section.build
