@@ -11,6 +11,50 @@
     --border-color: #eeeeef;
     --icon-color: #202124;
     --external-icon-color: var(--google-grey-700);
+
+    --surface-01-enabled: #525252;
+    --color-key-default: #ffffff;
+    --color-key-error: #ff5359;
+    --color-key-primary: #578cff;
+    --color-key-success: #05a831;
+    --color-key-warning: #e96d00;
+
+    --color-border: #aaabb1;
+    --color-border-subtle: #2e3035;
+
+    --color-surface-0: #111318;
+    --color-surface-1: #191c20;
+    --color-surface-2: #37393e;
+    --color-surface-canvas: #111318;
+
+    --color-inverse-surface: #f9f9ff;
+    --color-inverse-on-surface: #111318;
+    --color-inverse-primary: #006efe;
+
+    --color-on-error-container: #ffedea;
+    --color-on-primary-container: #ffffff;
+    --color-on-surface: #ffffff;
+    --color-on-surface-subtle: #aaabb1;
+
+    --color-surface-container-high: #32353a;
+    --color-container-surface: #1d2024;
+    --color-surface-container-low: #0c0e13;
+    --color-container-error: #ee0033;
+    --color-container-primary: #006efe;
+
+    --color-state-hover: #ffffff14;
+    --color-state-selected: rgba(255, 255, 255, 0.16);
+    --color-state-active: #00000029;
+    
+    --color-elevation-02: rgba(0, 0, 0, 0.12);
+    --color-elevation-04: rgba(0, 0, 0, 0.12);
+    --color-elevation-inset: rgba(255, 255, 255, 0.16);
+    --color-elevation-2-shadow: rgba(0, 0, 0, 0.16);
+    --color-elevation-3-shadow: rgba(0, 0, 0, 0.32);
+    --color-elevation-4-shadow: rgba(0, 0, 0, 0.48);
+    --color-elevation-5-shadow1: rgba(0, 0, 0, 0.48);
+    --color-elevation-5-shadow2: rgba(0, 0, 0, 0.48);
+
     --iframe-link: {
         text-decoration: none;
         color: inherit;
@@ -42,7 +86,7 @@
 #MainDrawer {
     color: white;
     --app-drawer-content-container: {
-        background: var(--primary-background-color) !important;
+        background-color: var(--color-surface-0) !important;
         display: flex !important;
         flex-direction: column !important;
     }
@@ -70,11 +114,10 @@ app-drawer-layout[narrow] #MainDrawer {
 }
 
 #MainDrawer .logo {
-    margin-left: 1em;
+    margin: 24px 24px 24px 24px;
 }
 
 #MainDrawer a:hover {
-    color: inherit;
     text-decoration: none;
 }
 
@@ -87,23 +130,24 @@ app-drawer-layout[narrow] #MainDrawer {
 }
 
 #MainDrawer .menu-item {
-    color: var(--sidebar-default-color);
+    color: var(--color-on-surface-subtle);
     cursor: pointer;
-    font-family: Google Sans;
-    font-size: 15px;
-    font-weight: 500;
-    letter-spacing: 0.3px;
-    line-height: 24px;
-    transition: background .25s;
+    font-family: Geist;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0px;
+    line-height: 16px;
+    transition: background-color .25s;
     --paper-item-icon-width: 36px;
-
+    padding: 8px;
+    margin-inline: 16px;
+    min-height: min-content;
+    border-radius: 4px;
 }
 
 #MainDrawer .inner-menu-item {
-    padding-left: 60px;
-    margin: 0;
-    font-size: 13px;
-    min-height: 30px;
+    min-height: 36px;
+    padding-inline: 16px 0;
 }
 
 #MainDrawer .section-item {
@@ -113,7 +157,7 @@ app-drawer-layout[narrow] #MainDrawer {
 }
 
 #MainDrawer iron-icon {
-    margin-right: 20px;
+    margin-right: 8px;
     height: 20px;
     width: 20px;
 }
@@ -125,22 +169,13 @@ app-drawer-layout[narrow] #MainDrawer {
 }
 
 #MainDrawer .menu-item:hover {
-    background: #ffffff1b
+    background-color: var(--color-state-hover)
 }
 
 #MainDrawer .iron-selected {
-    color: #fff;
-}
-
-#MainDrawer .iron-selected::after {
-    content: '';
-    display: block;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 3px;
-    background: white;
+    color: var(--color-on-surface);
+    background-color: var(--color-state-selected);
+    box-shadow: 0px 0px 0px 1px var(--color-elevation-2-shadow) inset;
 }
 
 #MainDrawer .footer {
