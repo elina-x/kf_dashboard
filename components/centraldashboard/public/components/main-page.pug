@@ -50,24 +50,17 @@ app-drawer-layout.flex(narrow='{{narrowMode}}',
                         paper-item.menu-item
                             iron-icon(icon='[[item.icon]]')
                             | [[item.text]]
-                            iron-icon.external(icon="launch")
             template(is='dom-if', if='[[equals(isolationMode, "multi-user")]]')
                 aside.divider
                 a(href$='[[_buildHref("/manage-users", queryParams.*)]]', tabindex='-1')
                     paper-item.menu-item#contributors Manage Contributors
         div.bottom-links
-            a(href='https://www.kubeflow.org/docs/about/kubeflow/',
+            a(href='https://ramsay.cloud-tmp.physicsx.ai/platform-documentation/ai_workbench/index.html',
                 tabindex='-1', target="_blank")
                 paper-item.menu-item
                     iron-icon(icon="info-outline")
                     | Documentation
-            logout-button(logout-url='[[logoutUrl]]')
         footer.footer
-            section.build
-                | build version -
-                |
-                span(title="Build: [[buildVersion]] | Dashboard: v[[dashVersion]] | Isolation-Mode: [[isolationMode]]")
-                    | [[buildVersion]]
     app-header-layout(fullbleed)
         app-header(slot='header', hides, hidden$='[[notFoundInIframe]]')
             app-toolbar
