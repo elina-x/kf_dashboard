@@ -10,29 +10,30 @@ resources:
 - service-account.yaml
 - service.yaml
 - configmap.yaml
+- network-policy.yaml
 images:
-- name: ghcr.io/kubeflow/kubeflow/central-dashboard
-  newName: ghcr.io/kubeflow/kubeflow/central-dashboard
+- name: ghcr.io/kubeflow/dashboard/dashboard
+  newName: ghcr.io/kubeflow/dashboard/dashboard
   newTag: latest
 configMapGenerator:
 - envs:
   - params.env
-  name: centraldashboard-parameters
+  name: dashboard-parameters
 generatorOptions:
   disableNameSuffixHash: true
 labels:
 - includeSelectors: true
   pairs:
-    app: centraldashboard
-    app.kubernetes.io/component: centraldashboard
-    app.kubernetes.io/name: centraldashboard
-    kustomize.component: centraldashboard
+    app: dashboard
+    app.kubernetes.io/component: dashboard
+    app.kubernetes.io/name: dashboard
+    kustomize.component: dashboard
 
 replacements:
 - source:
     fieldPath: data.CD_USERID_HEADER
     kind: ConfigMap
-    name: centraldashboard-parameters
+    name: dashboard-parameters
     version: v1
   targets:
   - fieldPaths:
@@ -40,12 +41,12 @@ replacements:
     select:
       group: apps
       kind: Deployment
-      name: centraldashboard
+      name: dashboard
       version: v1
 - source:
     fieldPath: data.CD_USERID_PREFIX
     kind: ConfigMap
-    name: centraldashboard-parameters
+    name: dashboard-parameters
     version: v1
   targets:
   - fieldPaths:
@@ -53,12 +54,12 @@ replacements:
     select:
       group: apps
       kind: Deployment
-      name: centraldashboard
+      name: dashboard
       version: v1
 - source:
     fieldPath: data.CD_REGISTRATION_FLOW
     kind: ConfigMap
-    name: centraldashboard-parameters
+    name: dashboard-parameters
     version: v1
   targets:
   - fieldPaths:
@@ -66,12 +67,12 @@ replacements:
     select:
       group: apps
       kind: Deployment
-      name: centraldashboard
+      name: dashboard
       version: v1
 - source:
     fieldPath: metadata.name
     kind: ConfigMap
-    name: centraldashboard-config
+    name: dashboard-config
     version: v1
   targets:
   - fieldPaths:
@@ -79,5 +80,5 @@ replacements:
     select:
       group: apps
       kind: Deployment
-      name: centraldashboard
+      name: dashboard
       version: v1
