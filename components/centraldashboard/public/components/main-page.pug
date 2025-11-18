@@ -19,47 +19,145 @@ app-drawer-layout.flex(narrow='{{narrowMode}}',
         figure.logo
             |!{logo}
         div.flex.scrollable
+            // Home - Always first
             a(href$='[[_buildHref("/", queryParams.*)]]', tabindex='-1')
                 paper-item.menu-item#home
-                    iron-icon(icon='home')
+                    iron-icon(icon='kubeflow:home')
                     | Home
 
+            // Sim Workbench - From externalLinks
+            template(is='dom-repeat', items='[[externalLinks]]')
+                template(is='dom-if', if='[[_isSimWorkbench(item)]]')
+                    template(is='dom-if', if='[[item.iframe]]')
+                        iframe-link(href$="[[_buildHref(item.link, queryParams.*)]]")
+                            paper-item.menu-item
+                                iron-icon(icon='[[item.icon]]')
+                                | [[item.text]]
+                    template(is='dom-if', if='[[!item.iframe]]')
+                        a(href$="[[_buildExternalHref(item.link, queryParams.*)]]", tabindex='-1', target="_blank")
+                            paper-item.menu-item
+                                iron-icon(icon='[[item.icon]]')
+                                | [[item.text]]
+
+            // Vault - From externalLinks
+            template(is='dom-repeat', items='[[externalLinks]]')
+                template(is='dom-if', if='[[_isVault(item)]]')
+                    template(is='dom-if', if='[[item.iframe]]')
+                        iframe-link(href$="[[_buildHref(item.link, queryParams.*)]]")
+                            paper-item.menu-item
+                                iron-icon(icon='[[item.icon]]')
+                                | [[item.text]]
+                    template(is='dom-if', if='[[!item.iframe]]')
+                        a(href$="[[_buildExternalHref(item.link, queryParams.*)]]", tabindex='-1', target="_blank")
+                            paper-item.menu-item
+                                iron-icon(icon='[[item.icon]]')
+                                | [[item.text]]
+
+            // Notebooks - From menuLinks
             template(is='dom-repeat', items='[[menuLinks]]')
-                template(is='dom-if', if='[[equals(item.type, "section")]]')
-                    paper-item.menu-item.section-item(on-click='_toggleMenuSection')
-                        iron-icon(icon='[[item.icon]]')
-                        | [[item.text]]
-                    iron-collapse
-                        template(is='dom-repeat', items='[[item.items]]')
-                            iframe-link(href$="[[_buildHref(item.link, queryParams.*)]]")
-                                paper-item.menu-item.inner-menu-item
-                                    | [[item.text]]
-                template(is='dom-if', if='[[!equals(item.type, "section")]]')
+                template(is='dom-if', if='[[_isNotebooks(item)]]')
                     iframe-link(href$="[[_buildHref(item.link, queryParams.*)]]")
                         paper-item.menu-item
                             iron-icon(icon='[[item.icon]]')
                             | [[item.text]]
+
+            // Volumes - From menuLinks
+            template(is='dom-repeat', items='[[menuLinks]]')
+                template(is='dom-if', if='[[_isVolumes(item)]]')
+                    iframe-link(href$="[[_buildHref(item.link, queryParams.*)]]")
+                        paper-item.menu-item
+                            iron-icon(icon='[[item.icon]]')
+                            | [[item.text]]
+
+            // Pipelines - From menuLinks
+            template(is='dom-repeat', items='[[menuLinks]]')
+                template(is='dom-if', if='[[_isPipelines(item)]]')
+                    template(is='dom-if', if='[[equals(item.type, "section")]]')
+                        paper-item.menu-item.section-item(on-click='_toggleMenuSection')
+                            iron-icon(icon='[[item.icon]]')
+                            | [[item.text]]
+                        iron-collapse
+                            template(is='dom-repeat', items='[[item.items]]')
+                                iframe-link(href$="[[_buildHref(item.link, queryParams.*)]]")
+                                    paper-item.menu-item.inner-menu-item
+                                        | [[item.text]]
+
+            // Endpoints - From menuLinks
+            template(is='dom-repeat', items='[[menuLinks]]')
+                template(is='dom-if', if='[[_isEndpoints(item)]]')
+                    iframe-link(href$="[[_buildHref(item.link, queryParams.*)]]")
+                        paper-item.menu-item
+                            iron-icon(icon='[[item.icon]]')
+                            | [[item.text]]
+
+            // ML Flow - From externalLinks
             template(is='dom-repeat', items='[[externalLinks]]')
-                template(is='dom-if', if='[[item.iframe]]')
-                    iframe-link(href$="[[buildHref(item.link, queryParams)]]")
-                        paper-item.menu-item
+                template(is='dom-if', if='[[_isMLflow(item)]]')
+                    template(is='dom-if', if='[[item.iframe]]')
+                        iframe-link(href$="[[_buildHref(item.link, queryParams.*)]]")
+                            paper-item.menu-item
+                                iron-icon(icon='[[item.icon]]')
+                                | [[item.text]]
+                    template(is='dom-if', if='[[!item.iframe]]')
+                        a(href$="[[_buildExternalHref(item.link, queryParams.*)]]", tabindex='-1', target="_blank")
+                            paper-item.menu-item
+                                iron-icon(icon='[[item.icon]]')
+                                | [[item.text]]
+
+            // Optimizer - From externalLinks
+            template(is='dom-repeat', items='[[externalLinks]]')
+                template(is='dom-if', if='[[_isOptimizer(item)]]')
+                    template(is='dom-if', if='[[item.iframe]]')
+                        iframe-link(href$="[[_buildHref(item.link, queryParams.*)]]")
+                            paper-item.menu-item
+                                iron-icon(icon='[[item.icon]]')
+                                | [[item.text]]
+                    template(is='dom-if', if='[[!item.iframe]]')
+                        a(href$="[[_buildExternalHref(item.link, queryParams.*)]]", tabindex='-1', target="_blank")
+                            paper-item.menu-item
+                                iron-icon(icon='[[item.icon]]')
+                                | [[item.text]]
+
+            // Other menu links that don't match the specific order
+            template(is='dom-repeat', items='[[menuLinks]]')
+                template(is='dom-if', if='[[_isOtherMenuItem(item)]]')
+                    template(is='dom-if', if='[[equals(item.type, "section")]]')
+                        paper-item.menu-item.section-item(on-click='_toggleMenuSection')
                             iron-icon(icon='[[item.icon]]')
                             | [[item.text]]
-                template(is='dom-if', if='[[!item.iframe]]')
-                    a(href$="[[_buildExternalHref(item.link, queryParams.*)]]", tabindex='-1', target="_blank")
-                        paper-item.menu-item
-                            iron-icon(icon='[[item.icon]]')
-                            | [[item.text]]
-            template(is='dom-if', if='[[equals(isolationMode, "multi-user")]]')
-                aside.divider
-                a(href$='[[_buildHref("/manage-users", queryParams.*)]]', tabindex='-1')
-                    paper-item.menu-item#contributors Manage Contributors
+                        iron-collapse
+                            template(is='dom-repeat', items='[[item.items]]')
+                                iframe-link(href$="[[_buildHref(item.link, queryParams.*)]]")
+                                    paper-item.menu-item.inner-menu-item
+                                        | [[item.text]]
+                    template(is='dom-if', if='[[!equals(item.type, "section")]]')
+                        iframe-link(href$="[[_buildHref(item.link, queryParams.*)]]")
+                            paper-item.menu-item
+                                iron-icon(icon='[[item.icon]]')
+                                | [[item.text]]
+
+            // Other external links that don't match the specific order
+            template(is='dom-repeat', items='[[externalLinks]]')
+                template(is='dom-if', if='[[_isOtherExternalItem(item)]]')
+                    template(is='dom-if', if='[[item.iframe]]')
+                        iframe-link(href$="[[_buildHref(item.link, queryParams.*)]]")
+                            paper-item.menu-item
+                                iron-icon(icon='[[item.icon]]')
+                                | [[item.text]]
+                    template(is='dom-if', if='[[!item.iframe]]')
+                        a(href$="[[_buildExternalHref(item.link, queryParams.*)]]", tabindex='-1', target="_blank")
+                            paper-item.menu-item
+                                iron-icon(icon='[[item.icon]]')
+                                | [[item.text]]
+
+
         div.bottom-links
-            a(href='https://ramsay.cloud-tmp.physicsx.ai/platform-documentation/ai_workbench/index.html',
-                tabindex='-1', target="_blank")
-                paper-item.menu-item
-                    iron-icon(icon="info-outline")
-                    | Documentation
+            template(is='dom-if', if='[[documentationLink]]')
+                a(href$='[[documentationLink]]',
+                    tabindex='-1', target="_blank")
+                    paper-item.menu-item
+                        iron-icon(icon="info-outline")
+                        | Documentation
         footer.footer
     app-header-layout(fullbleed)
         app-header(slot='header', hides, hidden$='[[notFoundInIframe]]')

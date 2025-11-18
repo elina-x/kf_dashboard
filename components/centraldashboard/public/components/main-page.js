@@ -45,6 +45,12 @@ import {IFRAME_LINK_PREFIX} from './iframe-link.js';
 import {
     ALL_NAMESPACES_ALLOWED_LIST, ALL_NAMESPACES,
 } from './namespace-selector';
+import {
+    getCurrentTenant,
+    getCurrentDomain,
+    processExternalLinks,
+    generateServiceUrl,
+} from './url-utils.js';
 
 
 /**
@@ -116,6 +122,13 @@ export class MainPage extends utilitiesMixin(PolymerElement) {
             },
             matchingIndex: Number,
             namespacedItemTemplete: String,
+            currentTenant: {type: String, value: '', readOnly: true},
+            currentDomain: {type: String, value: '', readOnly: true},
+            documentationLink: {
+                type: String,
+                // eslint-disable-next-line max-len
+                computed: 'computeDocumentationLink(documentationItems, currentTenant, currentDomain)',
+            },
         };
     }
 
@@ -129,6 +142,34 @@ export class MainPage extends utilitiesMixin(PolymerElement) {
             '_routePageChanged(routeData.page,subRouteData.path,routeHash.path)',
             '_namespaceChanged(queryParams.ns)',
         ];
+    }
+
+    /**
+     * Called when the element is ready
+     */
+    ready() {
+        super.ready();
+        this._initializeTenantAndDomain();
+    }
+
+    /**
+     * Initialize tenant and domain from current hostname
+     */
+    _initializeTenantAndDomain() {
+        const tenant = getCurrentTenant();
+        const domain = getCurrentDomain();
+
+        if (tenant) {
+            this._setCurrentTenant(tenant);
+        } else {
+            // eslint-disable-next-line no-console
+            console.warn('Could not extract tenant from hostname:',
+                window.location.hostname);
+        }
+
+        if (domain) {
+            this._setCurrentDomain(domain);
+        }
     }
 
     /**
@@ -183,9 +224,29 @@ export class MainPage extends utilitiesMixin(PolymerElement) {
             documentationItems,
         } = ev.detail.response;
         this.menuLinks = menuLinks || [];
-        this.externalLinks = externalLinks || [];
+
+        // Process external links with tenant information
+        if (this.currentTenant && externalLinks) {
+            this.externalLinks = processExternalLinks(
+                externalLinks, this.currentTenant, this.currentDomain);
+        } else {
+            this.externalLinks = externalLinks || [];
+        }
+
         this.quickLinks = quickLinks || [];
-        this.documentationItems = documentationItems || [];
+
+        // Process documentation items with tenant information
+        if (this.currentTenant && documentationItems) {
+            this.documentationItems = documentationItems.map((item) => {
+                const processedItem = Object.assign({}, item);
+                processedItem.link = item.link
+                    .replace(/\$\{TENANT\}/g, this.currentTenant)
+                    .replace(/\$\{DOMAIN\}/g, this.currentDomain);
+                return processedItem;
+            });
+        } else {
+            this.documentationItems = documentationItems || [];
+        }
     }
 
     /**
@@ -395,6 +456,37 @@ export class MainPage extends utilitiesMixin(PolymerElement) {
     }
 
     /**
+     * [ComputeProp] `documentationLink`
+     * @param {Array} documentationItems
+     * @param {string} currentTenant
+     * @param {string} currentDomain
+     * @return {string}
+     */
+    computeDocumentationLink(documentationItems, currentTenant, currentDomain) {
+        // First, try to use the first documentation item from config
+        if (documentationItems && documentationItems.length > 0) {
+            return documentationItems[0].link;
+        }
+
+        // Use dynamic URL generation if tenant is available
+        if (currentTenant) {
+            const aiWorkbenchUrl = generateServiceUrl(
+                'AI_WORKBENCH_DOCS', currentTenant, currentDomain);
+            if (aiWorkbenchUrl) {
+                return aiWorkbenchUrl;
+            }
+        }
+
+        // Fallback to tenant-based URL or default
+        if (currentTenant && currentDomain) {
+            return `https://${currentTenant}.${currentDomain}/platform-documentation/ai_workbench/index.html`;
+        }
+
+        // Return empty string if no valid documentation link found
+        return ``;
+    }
+
+    /**
      * Tries to determine which menu link to activate based on the provided
      * path.
      * @param {string} path
@@ -556,6 +648,88 @@ export class MainPage extends utilitiesMixin(PolymerElement) {
         }
 
         this.namespaces = [allNamespaces, ...namespaces];
+    }
+
+
+    _isSimWorkbench(item) {
+        return item.text === 'Sim Workbench';
+    }
+
+
+    _isVault(item) {
+        return item.text === 'Vault';
+    }
+
+    _isPipelines(item) {
+        return item.text === 'Pipelines';
+    }
+
+
+    _isEndpoints(item) {
+        return item.text === 'Endpoints';
+    }
+
+
+    _isMLflow(item) {
+        return item.text === 'MLflow';
+    }
+
+
+    _isOptimizer(item) {
+        return item.text === 'Optimizer';
+    }
+
+
+    _isNotebooks(item) {
+        return item.text === 'Notebooks';
+    }
+
+
+    _isVolumes(item) {
+        return item.text === 'Volumes';
+    }
+
+
+    _isOtherMenuItem(item) {
+        return !this._isPipelines(item) && !this._isEndpoints(item) &&
+            !this._isNotebooks(item) && !this._isVolumes(item);
+    }
+
+    _isOtherExternalItem(item) {
+        return !this._isSimWorkbench(item) &&
+               !this._isVault(item) &&
+               !this._isMLflow(item) &&
+               !this._isOptimizer(item);
+    }
+
+    _generateServiceUrl(serviceName) {
+        if (!this.currentTenant) {
+            return null;
+        }
+        return generateServiceUrl(
+            serviceName, this.currentTenant, this.currentDomain);
+    }
+
+    _getAllServiceUrls() {
+        if (!this.currentTenant) {
+            return {};
+        }
+
+        const urls = {};
+        const services = [
+            'MLFLOW', 'OPTIMIZER', 'VAULT', 'SIM_WORKBENCH',
+            'PLATFORM_DOCS', 'AI_WORKBENCH_DOCS',
+        ];
+
+        services.forEach((service) => {
+            const url = this._generateServiceUrl(service);
+            if (url) {
+                const serviceKey = service.toLowerCase().replace(/_/g, '-');
+                urls[serviceKey] = url;
+            }
+        });
+
+        return urls;
     }
 }
 
